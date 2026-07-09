@@ -38,6 +38,17 @@ function replaceAll(file, search, replacement) {
   fs.writeFileSync(file, patched);
 }
 
+function replaceAllIfPresent(file, search, replacement) {
+  const source = fs.readFileSync(file, "utf8");
+  if (source.includes(replacement)) {
+    return;
+  }
+  if (!source.includes(search)) {
+    return;
+  }
+  fs.writeFileSync(file, source.split(search).join(replacement));
+}
+
 replaceOnce(
   typeFile,
   '    DeviceType[DeviceType["LOCK_85P0"] = 209] = "LOCK_85P0";',
@@ -144,7 +155,7 @@ replaceAll(
             device.isLockWifiT85L1() ||`
 );
 
-replaceAll(
+replaceAllIfPresent(
   stationFile,
   "Device.isLockWifiT85L0(this.getDeviceType()) ||",
   `Device.isLockWifiT85L0(this.getDeviceType()) ||
@@ -158,7 +169,7 @@ replaceAll(
             !device_1.Device.isLockWifiT85L1(stationData.device_type) &&`
 );
 
-replaceAll(
+replaceAllIfPresent(
   stationFile,
   "Device.isLockWifiT85L0(stationData.device_type) ||",
   `Device.isLockWifiT85L0(stationData.device_type) ||
