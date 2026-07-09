@@ -41,7 +41,18 @@ STATION_IP_ADDRESSES_JQ=""
 if bashio::config.has_value 'stations'; then
     STATIONS_JSON="$(bashio::config 'stations')"
     STATION_IP_ADDRESSES_ARG="--argjson stations $STATIONS_JSON"
-    STATION_IP_ADDRESSES_JQ="stationIPAddresses: (\$stations | map({ (.serial_number): .ip_address }) | add),"
+    STATION_IP_ADDRESSES_JQ="stationIPAddresses: (
+      \$stations
+      | if type == \"array\" then . else [.] end
+      | map(
+          if type == \"string\" then (fromjson? // {}) else . end
+        )
+      | map(
+          select(type == \"object\" and has(\"serial_number\") and has(\"ip_address\"))
+          | { (.serial_number): .ip_address }
+        )
+      | add // {}
+    ),"
 fi
 
 PORT_OPTION=""
