@@ -35,25 +35,13 @@ if bashio::config.has_value 'trusted_device_name'; then
     TRUSTED_DEVICE_NAME_JQ="trustedDeviceName: \$trusted_device_name,"
 fi
 
+STATIONS_JSON="[]"
 STATION_IP_ADDRESSES_ARG=""
 STATION_IP_ADDRESSES_JQ=""
 if bashio::config.has_value 'stations'; then
-    while read -r data
-    do
-        TMP_DATA=($(echo "${data}" | tr -d "{}\"[:blank:]" | tr "," " " | sed 's/serial_number://g;s/ip_address://g'))
-        if [ "$STATION_IP_ADDRESSES_ARG" = "" ]; then
-            STATION_IP_ADDRESSES_ARG="--arg ${TMP_DATA[0]} ${TMP_DATA[1]}"
-            STATION_IP_ADDRESSES_JQ="stationIPAddresses: { \$${TMP_DATA[0]}"
-        else
-            STATION_IP_ADDRESSES_ARG="$STATION_IP_ADDRESSES_ARG --arg ${TMP_DATA[0]} ${TMP_DATA[1]}"
-            STATION_IP_ADDRESSES_JQ="$STATION_IP_ADDRESSES_JQ, \$${TMP_DATA[0]}"
-        fi
-    done <<<"$(bashio::config 'stations')"
-    if [ "$STATION_IP_ADDRESSES_ARG" != "" ]; then
-        STATION_IP_ADDRESSES_JQ="$STATION_IP_ADDRESSES_JQ }"
-    fi
-    #bashio::log.info "STATION_IP_ADDRESSES_JQ: ${STATION_IP_ADDRESSES_JQ}"
-    #bashio::log.info "STATION_IP_ADDRESSES_ARG: ${STATION_IP_ADDRESSES_ARG}"
+    STATIONS_JSON="$(bashio::config 'stations')"
+    STATION_IP_ADDRESSES_ARG="--argjson stations $STATIONS_JSON"
+    STATION_IP_ADDRESSES_JQ="stationIPAddresses: (\$stations | map({ (.serial_number): .ip_address }) | add),"
 fi
 
 PORT_OPTION=""
@@ -104,4 +92,3 @@ if bashio::config.has_value 'username' && bashio::config.has_value 'password'; t
 else
     echo "Required parameters username and/or password not set. Starting aborted!"
 fi
-
