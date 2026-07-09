@@ -1,3 +1,9 @@
+## 3.1.0-plus.2
+
+- Expanded the T85L1 compatibility patch to include additional smart-lock
+  station checks used for lock status and parameter refresh.
+- Prepared a versioned add-on update for Home Assistant auto-update tracking.
+
 ## 1.9.7
 - Updated eufy-security-ws to version [`1.9.7`](https://github.com/bropat/eufy-security-ws/releases/tag/1.9.7)
 

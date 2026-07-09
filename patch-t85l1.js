@@ -146,9 +146,23 @@ replaceAll(
 
 replaceAll(
   stationFile,
+  "Device.isLockWifiT85L0(this.getDeviceType()) ||",
+  `Device.isLockWifiT85L0(this.getDeviceType()) ||
+      Device.isLockWifiT85L1(this.getDeviceType()) ||`
+);
+
+replaceAll(
+  stationFile,
   "!device_1.Device.isLockWifiT85L0(stationData.device_type) &&",
   `!device_1.Device.isLockWifiT85L0(stationData.device_type) &&
             !device_1.Device.isLockWifiT85L1(stationData.device_type) &&`
+);
+
+replaceAll(
+  stationFile,
+  "Device.isLockWifiT85L0(stationData.device_type) ||",
+  `Device.isLockWifiT85L0(stationData.device_type) ||
+                                            Device.isLockWifiT85L1(stationData.device_type) ||`
 );
 
 replaceAll(
